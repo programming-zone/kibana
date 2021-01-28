@@ -11,7 +11,7 @@ import { REPO_ROOT } from '@kbn/utils';
 
 import path from 'path';
 import { FtrProviderContext } from '../../ftr_provider_context';
-import { fetchSavedObjects, flushSavedObjects } from '../../../utils/utils';
+import { exportSavedObjects, flushSavedObjects, mkDir } from '../../../utils/utils';
 
 export default function ({ getService, getPageObjects }: FtrProviderContext) {
   const browser = getService('browser');
@@ -40,11 +40,13 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       await PageObjects.timePicker.setDefaultAbsoluteRange();
     });
 
-    before(async function exportSavedObjects() {
-      const dest = 'test/functional/fixtures/exported_saved_objects/discover/exported.json';
-      const resolved = path.resolve(REPO_ROOT, dest);
+    before(async function fetchSavedObjects() {
+      const dest = 'test/functional/fixtures/exported_saved_objects/discover';
+      const destDir = path.join(REPO_ROOT, dest);
+      const destFilePath = path.join(destDir, './exported.json');
 
-      await flushSavedObjects(resolved)(log)(await fetchSavedObjects()(log, supertest));
+      mkDir(destDir);
+      await flushSavedObjects(destFilePath)(log)(await exportSavedObjects()(log, supertest));
     });
 
     describe('query', function () {
