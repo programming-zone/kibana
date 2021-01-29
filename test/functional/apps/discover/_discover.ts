@@ -7,11 +7,9 @@
  */
 
 import expect from '@kbn/expect';
-import { REPO_ROOT } from '@kbn/utils';
-
-import path from 'path';
 import { FtrProviderContext } from '../../ftr_provider_context';
-import { exportSavedObjects, flushSavedObjects, mkDir } from '../../../utils/utils';
+// @ts-ignore
+import { main } from '../../../utils/fetch_saved_objects';
 
 export default function ({ getService, getPageObjects }: FtrProviderContext) {
   const browser = getService('browser');
@@ -42,11 +40,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
 
     before(async function fetchSavedObjects() {
       const dest = 'test/functional/fixtures/exported_saved_objects/discover';
-      const destDir = path.join(REPO_ROOT, dest);
-      const destFilePath = path.join(destDir, './exported.json');
-
-      mkDir(destDir);
-      await flushSavedObjects(destFilePath)(log)(await exportSavedObjects()(log, supertest));
+      await main(dest)(log)(supertest);
     });
 
     describe('query', function () {
